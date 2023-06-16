@@ -1,6 +1,6 @@
 # Features
 
-- [ ] Implement REST endpoints using Axum
+- [X] Implement REST endpoints using Axum
 - [ ] Add logging library
 - [ ] Instrument with OpenTelemetry
 - [ ] Add Postgres integration 
