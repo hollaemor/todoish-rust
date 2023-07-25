@@ -1,0 +1,8 @@
+-- Add up migration script here
+CREATE TABLE
+  IF NOT EXISTS tasks (
+    id UUID NOT NULL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    done BOOLEAN NOT NULL DEFAULT 'f',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
