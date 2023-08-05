@@ -1,9 +1,9 @@
+use crate::tasks::domain::{Task, TaskError};
 use async_trait::async_trait;
-use std::sync::{Arc, Mutex};
 use sqlx::{self, postgres::PgRow, Row};
+use std::sync::{Arc, Mutex};
 use tracing;
 use uuid::Uuid;
-use crate::tasks::domain::{Task, TaskError};
 
 #[async_trait]
 pub trait TaskRepository {
@@ -33,6 +33,7 @@ where
 
 #[async_trait]
 impl TaskRepository for PostgresTaskRepository {
+    #[tracing::instrument(name="save task", fields(name=%task.name), skip(self, task))]
     async fn save(&self, task: &Task) -> Result<(), TaskError> {
         sqlx::query("INSERT INTO tasks(id, name, done) VALUES ($1, $2, $3)")
             .bind(&task.id)
@@ -44,6 +45,7 @@ impl TaskRepository for PostgresTaskRepository {
         Ok(())
     }
 
+    #[tracing::instrument(name = "get all tasks", skip(self))]
     async fn get_all(&self) -> Result<Vec<Task>, TaskError> {
         sqlx::query("SELECT id, name, done FROM tasks ORDER BY created_at DESC")
             .map(|row: PgRow| Task {
@@ -56,6 +58,7 @@ impl TaskRepository for PostgresTaskRepository {
             .map_err(|e| map_to_task_error(e, TaskError::GetTaskError))
     }
 
+    #[tracing::instrument(name = "get task by id", skip(self))]
     async fn get_by_id(&self, id: &Uuid) -> Result<Task, TaskError> {
         sqlx::query("SELECT id, name, done FROM tasks WHERE id = $1")
             .bind(id)
@@ -69,6 +72,7 @@ impl TaskRepository for PostgresTaskRepository {
             .map_err(|e| map_to_task_error(e, TaskError::IdNotFound))
     }
 
+    #[tracing::instrument(name = "update task", skip(self))]
     async fn update(&self, id: &Uuid) -> Result<(), TaskError> {
         let count = sqlx::query("UPDATE tasks SET done = 't' WHERE id = $1")
             .bind(id)
@@ -83,7 +87,6 @@ impl TaskRepository for PostgresTaskRepository {
         }
     }
 }
-
 
 pub struct InMemoryTaskRepository {
     tasks: Arc<Mutex<Vec<Task>>>,

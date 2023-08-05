@@ -1,11 +1,10 @@
-mod api;
-mod config;
-mod tasks;
 use std::error::Error;
 use std::sync::Arc;
 
-use crate::api::rest::server::create_server;
-use crate::tasks::repository::PostgresTaskRepository;
+use todo_ish::api::rest::server::create_server;
+use todo_ish::tasks::repository::PostgresTaskRepository;
+
+use todo_ish::config;
 
 use sqlx;
 use tracing::Level;

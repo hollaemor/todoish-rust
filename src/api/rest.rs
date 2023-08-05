@@ -40,15 +40,18 @@ pub mod server {
         }
     }
 
-    pub async fn create_server(
-        arc: Arc<dyn TaskRepository + Send + Sync>,
-        config: &AppConfig,
-    ) -> Result<(), Box<dyn Error>> {
+    pub fn create_app(arc: Arc<dyn TaskRepository + Send + Sync>) -> Router {
         let app_state = AppState { repository: arc };
         let task_routes = get_routes(app_state.clone());
 
         let app = Router::new().nest("/v1/tasks", task_routes);
+        app
+    }
 
+    pub async fn create_server(
+        arc: Arc<dyn TaskRepository + Send + Sync>,
+        config: &AppConfig,
+    ) -> Result<(), Box<dyn Error>> {
         let listener =
             tokio::net::TcpListener::bind(format!("0.0.0.0:{}", config.server_port)).await?;
         tracing::debug!(
@@ -57,7 +60,7 @@ pub mod server {
         );
 
         axum::Server::from_tcp(listener.into_std()?)?
-            .serve(app.into_make_service())
+            .serve(create_app(arc).into_make_service())
             .await?;
         Ok(())
     }
@@ -87,7 +90,6 @@ pub mod endpoints {
 
             Ok(Json(response))
         }
-        #[axum::debug_handler]
         async fn create_task(
             State(app): State<AppState>,
             Json(task): Json<CreateTask>,

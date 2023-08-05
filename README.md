@@ -4,12 +4,13 @@
 - [ ] Instrument with OpenTelemetry
 - [X] Add Postgres integration 
 - [X] Add sqlx integration
-- [ ] Add config integration
+- [X] Add config integration
 - [ ] gRPC
 - [ ] Redis
 - [ ] Add test cases
 - [ ] Add graceful shutdown handler
 - [X] Add logging library
-- [ ] Re-organize project
+- [X] Re-organize project
 - [ ] Containerize
 - [ ] Deploy in K8s
+- [ ]  Add user authentication
