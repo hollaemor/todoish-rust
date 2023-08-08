@@ -8,7 +8,7 @@
 - [ ] gRPC
 - [ ] Redis
 - [ ] Add test cases
-- [ ] Add graceful shutdown handler
+- [X] Add graceful shutdown handler
 - [X] Add logging library
 - [X] Re-organize project
 - [ ] Containerize

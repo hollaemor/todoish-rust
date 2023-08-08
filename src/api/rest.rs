@@ -10,7 +10,7 @@ pub mod server {
     use hyper::StatusCode;
     use serde_json::json;
     use std::error::Error;
-    use tokio;
+    use tokio::{self, signal};
     use tracing;
 
     use super::endpoints::tasks::get_routes;
@@ -61,8 +61,35 @@ pub mod server {
 
         axum::Server::from_tcp(listener.into_std()?)?
             .serve(create_app(arc).into_make_service())
+            .with_graceful_shutdown(shutdown_signal())
             .await?;
         Ok(())
+    }
+
+    async fn shutdown_signal() {
+        let ctrl_c = async {
+            signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+c handler");
+        };
+
+        #[cfg(unix)]
+        let terminate = async {
+            signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+        };
+
+        #[cfg(not(unix))]
+        let terminate = std::future::pending::<()>();
+
+        tokio::select! {
+            _ = ctrl_c => {},
+            _ = terminate => {}
+        }
+
+        println!("signal received, starting graceful shutdown");
     }
 }
 
