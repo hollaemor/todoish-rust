@@ -4,7 +4,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct AppConfig {
     pub database_url: String,
-    // the port on which the http server should listen on
+    /// the port on which the http server should listen on
     pub server_port: i64,
 }
 
